@@ -364,43 +364,17 @@ export function generateSampleInitialProfile(): UserProfile {
     subjectsData[sub] = {
       examDate: datesheet[sub],
       weeklyTargetHours: sub === 'Mathematics' || sub === 'Social Science' ? 6 : 4,
-      chapters: chaptersList.map((chName, idx) => {
-        // Seed some realistic progress for instant visualization
-        let states = stages.map(() => 0);
-        if (sub === 'Mathematics') {
-          if (idx < 3) states = stages.map(() => 2); // all done
-          else if (idx === 3 || idx === 4) states = [2, 2, 2, 0, 0];
-          else if (idx === 5) states = [1, 0, 0, 0, 0];
-        } else if (sub === 'Physics') {
-          if (idx < 2) states = stages.map(() => 2);
-          else if (idx === 2) states = [2, 1, 0, 0];
-        } else if (sub === 'Chemistry') {
-          if (idx < 2) states = stages.map(() => 2);
-        } else if (sub === 'Biology') {
-          if (idx === 0) states = [2, 2, 2, 0];
-          else if (idx === 1) states = [2, 1, 0, 0];
-        } else if (sub === 'Social Science') {
-          if (idx < 8) states = stages.map(() => 2);
-          else if (idx === 8) states = [2, 2, 1, 0, 0];
-        } else if (sub === 'English') {
-          if (idx === 0) states = [2, 1, 0, 0];
-        } else if (sub === 'Hindi') {
-          if (idx === 0) states = [2, 0, 0, 0];
-        }
-        return {
-          id: 'ch_' + Math.random().toString(36).substring(2, 9),
-          name: chName,
-          stageStates: states
-        };
-      })
+      chapters: chaptersList.map(chName => ({
+        id: 'ch_' + Math.random().toString(36).substring(2, 9),
+        name: chName,
+        stageStates: stages.map(() => 0)
+      }))
     };
   });
 
-  // Default habits
+  // Default habits (all uncompleted / fresh)
   const habits: SubjectHabit[] = [];
   const todayStr = new Date().toISOString().split('T')[0];
-  const yesterdayStr = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-  const dayBeforeStr = new Date(Date.now() - 2 * 86400000).toISOString().split('T')[0];
 
   SUBJECTS.forEach(sub => {
     (DEFAULT_HABITS[sub] || []).forEach(habitTitle => {
@@ -408,105 +382,25 @@ export function generateSampleInitialProfile(): UserProfile {
         id: 'hab_' + Math.random().toString(36).substring(2, 8),
         subject: sub,
         title: habitTitle,
-        completedDates: Math.random() > 0.4 ? [yesterdayStr, dayBeforeStr] : [dayBeforeStr]
+        completedDates: []
       });
     });
   });
 
-  // Default past 7 days study sessions
-  const sessions: StudySession[] = [
-    {
-      id: 'sess_1',
-      subject: 'Mathematics',
-      chapterName: 'Ch 4: Quadratic Equations',
-      durationMinutes: 65,
-      timestamp: new Date(Date.now() - 3600000 * 3).toISOString(),
-      notes: 'Solved 15 questions from NCERT and exemplar roots method.'
-    },
-    {
-      id: 'sess_2',
-      subject: 'Physics',
-      chapterName: 'Ch 3: Electricity',
-      durationMinutes: 45,
-      timestamp: new Date(Date.now() - 3600000 * 7).toISOString(),
-      notes: 'Resistors in series and parallel derivations and numericals.'
-    },
-    {
-      id: 'sess_3',
-      subject: 'Social Science',
-      chapterName: 'Ch 2: Nationalism in India',
-      durationMinutes: 50,
-      timestamp: new Date(Date.now() - 86400000 - 3600000 * 4).toISOString(),
-      notes: 'Timeline chart and Non-Cooperation Movement key dates.'
-    },
-    {
-      id: 'sess_4',
-      subject: 'Chemistry',
-      chapterName: 'Ch 1: Chemical Reactions & Equations',
-      durationMinutes: 40,
-      timestamp: new Date(Date.now() - 86400000 * 2).toISOString(),
-      notes: 'Oxidation, reduction, and redox reactions practice.'
-    },
-    {
-      id: 'sess_5',
-      subject: 'Biology',
-      chapterName: 'Ch 1: Life Processes',
-      durationMinutes: 55,
-      timestamp: new Date(Date.now() - 86400000 * 3).toISOString(),
-      notes: 'Human alimentary canal & nephron diagram practice.'
-    },
-    {
-      id: 'sess_6',
-      subject: 'Mathematics',
-      chapterName: 'Ch 8: Introduction to Trigonometry',
-      durationMinutes: 60,
-      timestamp: new Date(Date.now() - 86400000 * 4).toISOString(),
-      notes: 'Trigonometric identities proof exercises.'
-    },
-    {
-      id: 'sess_7',
-      subject: 'English',
-      chapterName: 'Ch 1: A Letter to God',
-      durationMinutes: 35,
-      timestamp: new Date(Date.now() - 86400000 * 5).toISOString(),
-      notes: 'Irony in Lencho character sketch & theme.'
-    }
-  ];
-
-  // Default sleep logs for past 7 days
+  // Empty sessions & sleep logs for fresh reset
+  const sessions: StudySession[] = [];
   const sleepLogs: Record<string, DailySleepLog> = {};
-  const sleepDays = [
-    { offset: 0, hours: 7.5, quality: 'excellent' as const, bed: '23:00', wake: '06:30', notes: 'Sound sleep, ready for full focus!' },
-    { offset: 1, hours: 7.0, quality: 'good' as const, bed: '23:30', wake: '06:30', notes: 'Consistent rest.' },
-    { offset: 2, hours: 8.0, quality: 'excellent' as const, bed: '22:30', wake: '06:30', notes: 'Great recovery night.' },
-    { offset: 3, hours: 6.5, quality: 'fair' as const, bed: '00:00', wake: '06:30', notes: 'Slightly late sleep.' },
-    { offset: 4, hours: 7.5, quality: 'excellent' as const, bed: '23:00', wake: '06:30', notes: 'High energy day.' },
-    { offset: 5, hours: 7.0, quality: 'good' as const, bed: '23:15', wake: '06:15', notes: 'Woke up fresh.' },
-    { offset: 6, hours: 8.0, quality: 'excellent' as const, bed: '22:30', wake: '06:30', notes: 'Solid weekend sleep.' }
-  ];
-
-  sleepDays.forEach(item => {
-    const dStr = new Date(Date.now() - item.offset * 86400000).toISOString().split('T')[0];
-    sleepLogs[dStr] = {
-      date: dStr,
-      hours: item.hours,
-      bedTime: item.bed,
-      wakeTime: item.wake,
-      quality: item.quality,
-      notes: item.notes
-    };
-  });
 
   return {
     id: 'prof_' + Date.now(),
-    name: 'Umang',
+    name: 'Aarav',
     classLevel: 'Class 10',
     customStages,
     subjects: subjectsData,
     sessions,
     habits,
     sleepLogs,
-    streak: 6,
+    streak: 0,
     lastActiveDate: todayStr,
     createdAt: new Date().toISOString(),
     targetExamName: 'CBSE Class 10 Board Exam'

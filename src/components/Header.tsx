@@ -37,7 +37,7 @@ export const Header: React.FC<HeaderProps> = ({
   }, []);
 
   const getInitials = (name: string) => {
-    if (!name) return 'U';
+    if (!name) return 'A';
     const parts = name.trim().split(' ');
     if (parts.length >= 2) {
       return (parts[0][0] + parts[1][0]).toUpperCase();
@@ -90,7 +90,7 @@ export const Header: React.FC<HeaderProps> = ({
               className="flex items-center gap-2 rounded-full border border-white/10 bg-[#161b22] px-2.5 py-1 text-xs font-semibold text-[#f0f6fc] transition-all hover:border-[#58a6ff]/50 hover:bg-[#1c2129] sm:px-3 sm:py-1.5 sm:text-sm"
             >
               <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-tr from-[#58a6ff] to-blue-600 text-[11px] font-bold text-white shadow-inner">
-                {activeProfile ? getInitials(activeProfile.name) : 'U'}
+                {activeProfile ? getInitials(activeProfile.name) : 'A'}
               </div>
               <span className="max-w-[100px] truncate sm:max-w-[140px]">
                 {activeProfile ? `${activeProfile.name} - ${activeProfile.classLevel}` : 'Select Profile'}

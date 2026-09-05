@@ -58,6 +58,16 @@ export default function App() {
       if (stored) {
         const parsed: UserProfile[] = JSON.parse(stored);
         if (parsed && parsed.length > 0) {
+          // If previous session contained the old default 'Umang' profile, auto-migrate to fresh reset profile
+          const hasOldDefault = parsed.some(p => p.name === 'Umang');
+          if (hasOldDefault) {
+            const fresh = generateSampleInitialProfile();
+            setProfiles([fresh]);
+            setActiveProfileId(fresh.id);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify([fresh]));
+            localStorage.setItem(ACTIVE_PROFILE_KEY, fresh.id);
+            return;
+          }
           setProfiles(parsed);
           const savedActiveId = localStorage.getItem(ACTIVE_PROFILE_KEY);
           const matched = parsed.find(p => p.id === savedActiveId);
@@ -69,7 +79,7 @@ export default function App() {
       console.error('Failed to parse profiles from localStorage', e);
     }
 
-    // Fallback: seed realistic initial profile
+    // Fallback: seed fresh initial profile
     const initial = generateSampleInitialProfile();
     setProfiles([initial]);
     setActiveProfileId(initial.id);
